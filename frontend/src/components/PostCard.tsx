@@ -1,66 +1,75 @@
 import { Post } from "@/types";
-import { MessageCircle, Heart, Repeat2, AlertOctagon } from "lucide-react";
+import { MessageCircle, Heart, Repeat2, AlertTriangle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface PostCardProps {
   post: Post;
-  isCurrentUser: boolean; // 閲覧者が投稿者本人かどうか
+  isCurrentUser: boolean;
 }
 
 export const PostCard = ({ post, isCurrentUser }: PostCardProps) => {
-  // NGワードの表示ロジック
-  // 本人の場合は "???"、他人の場合は実際のワードを表示
   const displayNgWord = isCurrentUser ? "???" : post.user.ngWord;
 
   return (
-    <div className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${post.isBanned ? 'bg-red-50' : ''}`}>
-      <div className="flex gap-3">
-        {/* アバター画像 */}
-        <img
-          src={post.user.avatarUrl}
-          alt={post.user.name}
-          className="w-10 h-10 rounded-full bg-gray-200 object-cover"
-        />
+    <Card className="mb-4 overflow-hidden border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
+      <CardContent className="p-4 flex gap-4">
+
+        {/* アバター */}
+        <Avatar className="w-12 h-12 border-2 border-background">
+          <AvatarImage src={post.user.avatarUrl} alt={post.user.name} className="object-cover" />
+          <AvatarFallback>{post.user.name.slice(0, 2)}</AvatarFallback>
+        </Avatar>
 
         <div className="flex-1 min-w-0">
-          {/* ヘッダー部分：名前とNGワードバッジ */}
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2 truncate">
-              <span className="font-bold text-gray-900 truncate">{post.user.name}</span>
-              <span className="text-gray-500 text-sm truncate">{post.user.handle}</span>
+          {/* ヘッダー部分 */}
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-foreground text-[15px]">{post.user.name}</span>
+                <span className="text-muted-foreground text-xs">{post.user.handle}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">2分前</p>
             </div>
 
             {/* NGワードバッジ */}
-            <div className={`px-2 py-0.5 rounded text-xs font-bold border flex items-center gap-1
-              ${isCurrentUser
-                ? "bg-gray-100 text-gray-500 border-gray-200" // 自分用（地味）
-                : "bg-red-50 text-red-600 border-red-200"     // 他人用（目立つ）
-              }`}
+            {/* variant="destructive" で赤色、"secondary" でグレーになります */}
+            <Badge
+              variant={isCurrentUser ? "secondary" : "destructive"}
+              className={`px-3 py-1 text-xs font-bold gap-1.5 ${!isCurrentUser && "shadow-sm shadow-red-200"}`}
             >
-              <AlertOctagon className="w-3 h-3" />
-              <span>NG: {displayNgWord}</span>
-            </div>
+              <AlertTriangle className="w-3 h-3" strokeWidth={3} />
+              {isCurrentUser ? "SECRET" : displayNgWord}
+            </Badge>
           </div>
 
-          {/* 投稿本文 */}
-          <p className="text-gray-800 whitespace-pre-wrap mb-3 leading-relaxed">
+          {/* 本文 */}
+          <p className="text-foreground/90 leading-relaxed text-[15px] mb-3 whitespace-pre-wrap">
             {post.content}
           </p>
 
-          {/* アクションボタン（将来機能用プレースホルダー） */}
-          <div className="flex items-center justify-between text-gray-400 max-w-xs">
-            <button className="flex items-center gap-1 hover:text-blue-500 transition-colors group">
-              <MessageCircle className="w-4 h-4" />
-              <span className="text-xs">返信</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-green-500 transition-colors group">
-              <Repeat2 className="w-4 h-4" />
-            </button>
-            <button className="flex items-center gap-1 hover:text-pink-500 transition-colors group">
-              <Heart className="w-4 h-4" />
-            </button>
+          {/* アクションボタン (Ghost variantでアイコンのみ表示) */}
+          <div className="flex items-center gap-1 -ml-2">
+            <ActionButton icon={MessageCircle} count={0} />
+            <ActionButton icon={Repeat2} count={0} />
+            <ActionButton icon={Heart} count={0} />
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
+
+// ヘルパーコンポーネント
+const ActionButton = ({ icon: Icon, count }: any) => (
+  <Button
+    variant="ghost"
+    size="sm"
+    className="text-muted-foreground hover:text-foreground h-8 px-2 rounded-full gap-1.5"
+  >
+    <Icon className="w-4 h-4" />
+    {count > 0 && <span className="text-xs">{count}</span>}
+  </Button>
+);

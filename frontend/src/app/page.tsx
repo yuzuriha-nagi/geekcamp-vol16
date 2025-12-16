@@ -9,19 +9,14 @@ import { Post } from "@/types";
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
 
-  // 投稿ハンドラー
   const handlePost = (content: string) => {
-    // 簡易BAN判定ロジック（実際はバックエンドで行う処理）
-    // 自分のNGワードが含まれているかチェック
+    // 簡易BAN判定
     const isBanned = content.includes(CURRENT_USER.ngWord);
-
     if (isBanned) {
-      alert(`【BAN確定】\n禁止ワード「${CURRENT_USER.ngWord}」が含まれていました。\nあなたのアカウントは凍結されます。`);
-      // ここで画面を真っ赤にするなどの処理を入れると面白い
+      alert(`☠️ GAME OVER ☠️\n\n禁止ワード「${CURRENT_USER.ngWord}」を踏みました。`);
       return;
     }
 
-    // 新しい投稿を作成してリストの先頭に追加
     const newPost: Post = {
       id: crypto.randomUUID(),
       userId: CURRENT_USER.id,
@@ -29,22 +24,19 @@ export default function Home() {
       createdAt: new Date().toISOString(),
       user: CURRENT_USER,
     };
-
     setPosts([newPost, ...posts]);
   };
 
   return (
-    <main className="min-h-screen bg-white max-w-2xl mx-auto border-x border-gray-100 shadow-sm">
-      {/* 画面ヘッダー */}
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b px-4 h-14 flex items-center justify-center">
-        <h1 className="font-black text-xl text-blue-500">WordWolf SNS</h1>
-      </header>
+    // 背景をリッチなグレーに変更
+    <main className="max-w-xl mx-auto pt-6 px-2 sm:px-0 pb-20">
 
-      {/* 投稿フォーム */}
+      {/* 入力フォーム */}
+      {/* Headerの高さ(約64px/4rem) + 余白分を考慮して top を設定 */}
       <PostInput currentUser={CURRENT_USER} onPost={handlePost} />
 
       {/* タイムライン */}
-      <div className="pb-20">
+      <div className="space-y-4 mt-6">
         {posts.map((post) => (
           <PostCard
             key={post.id}
