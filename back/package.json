@@ -1,0 +1,13 @@
+{
+  "name": "back",
+  "dependencies": {
+    "@hono/node-server": "^1.19.7",
+    "hono": "^4.11.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  },
+  "scripts": {
+    "hono:dev": "ts-node src/server.ts"
+  }
+}
