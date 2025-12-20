@@ -10,6 +10,14 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handle = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+      const codeVerifier = params.get("code_verifier");
+      if (!code || !codeVerifier) {
+        setMessage("認証コードが見つかりませんでした");
+        return;
+      }
+
       try {
         const supabase = getSupabaseClient();
         const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);

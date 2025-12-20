@@ -18,10 +18,13 @@ export default function Register() {
   const handleGoogle = async () => {
     try {
       const supabase = getSupabaseClient();
+      const redirectTo =
+        (process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin) +
+        "/auth/callback";
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo,
         },
       });
       if (error) setError(error.message);
