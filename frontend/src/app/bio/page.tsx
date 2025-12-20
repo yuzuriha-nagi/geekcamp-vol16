@@ -2,161 +2,166 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CURRENT_USER } from "@/data/mock"; // ★追加: モックデータをインポート
+import { CURRENT_USER } from "@/data/mock";
+import { ShieldAlert, Save, X, Edit3 } from "lucide-react";
+
+// shadcn UI components
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 
 export default function BioPage() {
   const router = useRouter();
-
-  // 状態管理
   const [username, setUsername] = useState("");
   const [profileText, setProfileText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [tempText, setTempText] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // 1. マウント時にモックデータから情報を取得
   useEffect(() => {
-    // ログインチェック (必要に応じて残すか、開発中はコメントアウト)
-    const savedUser = localStorage.getItem("user");
-    if (!savedUser) {
-      // router.push("/");
-      // return;
-    }
-
-    // ★修正: モックデータ(CURRENT_USER)から初期値をセット
-    setUsername(CURRENT_USER.name); // 表示名をセット
-
-    // CURRENT_USERに 'bio' プロパティがあると想定
-    // 型定義に bio がない場合は (CURRENT_USER as any).bio で回避
+    // 開発用: モックデータから初期値をセット
+    setUsername(CURRENT_USER.name);
     setProfileText((CURRENT_USER as any).bio || "自己紹介が未設定です。");
   }, [router]);
 
-  // 編集開始
   const handleEdit = () => {
     setTempText(profileText);
     setIsEditing(true);
   };
 
-  // 保存処理
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // ★注意: モックデータなのでサーバーには保存されませんが、
-      // 動作確認用に通信処理のフリをしてステートだけ更新します。
-
-      /* バックエンドがある場合は以下のfetchを使う
-      const payload = {
-        userId: CURRENT_USER.id,
-        profileText: tempText,
-      };
-      const response = await fetch("http://localhost:3001/update-profile", ...);
-      */
-
-      // 擬似的な遅延と成功処理
+      // 擬似的な保存処理
       await new Promise(resolve => setTimeout(resolve, 800));
-
       setProfileText(tempText);
       setIsEditing(false);
-
-      // 必要ならlocalStorageにも保存して永続化のフリをする
-      localStorage.setItem("user", JSON.stringify({ ...CURRENT_USER, bio: tempText }));
-
       alert("プロフィールの更新に成功。監視対象データが書き換えられました。");
-
     } catch (error) {
       console.error("エラー:", error);
-      alert("処理に失敗しました。");
     } finally {
       setIsSaving(false);
     }
   };
 
-  // ユーザー名が決まるまでローディング（一瞬で終わりますが念のため）
   if (!username) return <div className="min-h-screen bg-gray-900" />;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 font-sans relative overflow-hidden">
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-red-900 via-black to-gray-900 opacity-90"></div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 font-sans p-4 relative overflow-hidden">
+      {/* 背景グラデーション */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-red-900 via-black to-gray-900 opacity-90 pointer-events-none"></div>
 
-      <main className="relative z-10 w-full max-sm:mx-4 max-w-md rounded-xl bg-black/90 p-8 shadow-[0_0_50px_rgba(220,38,38,0.3)] backdrop-blur-sm border border-red-900/30">
+      <Card className="relative z-10 w-full max-w-md border-red-900/30 bg-black/90 shadow-[0_0_50px_rgba(220,38,38,0.2)] backdrop-blur-sm">
 
-        <div className="flex flex-col items-center mb-8">
-          <div className="relative w-24 h-24 mb-4">
-            <div className="w-full h-full bg-gradient-to-tr from-red-600 to-gray-800 rounded-full flex items-center justify-center border-2 border-red-500 shadow-lg shadow-red-600/20 overflow-hidden">
-              {/* モックデータのアイコンを使用 */}
-              <img src={CURRENT_USER.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-            </div>
-            <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-4 border-black rounded-full"></div>
+        <CardHeader className="flex flex-col items-center pb-2">
+          {/* アバターエリア */}
+          <div className="relative mb-4 group cursor-pointer">
+            <div className="absolute -inset-0.5 bg-gradient-to-tr from-red-600 to-gray-800 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
+            <Avatar className="w-24 h-24 border-2 border-black relative">
+              <AvatarImage src={CURRENT_USER.avatarUrl} alt={username} className="object-cover" />
+              <AvatarFallback className="bg-gray-800 text-gray-400">AG</AvatarFallback>
+            </Avatar>
+            {/* オンラインステータスランプ */}
+            <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-4 border-black rounded-full shadow-sm"></div>
           </div>
-          <h1 className="text-xl font-bold text-white tracking-widest uppercase">
+
+          <h1 className="text-xl font-black text-white tracking-widest uppercase">
             {username}
           </h1>
-          <p className="text-[10px] text-red-500 font-bold tracking-[0.2em] mt-1">
+          <p className="text-[10px] text-red-500 font-bold tracking-[0.2em] mt-1 animate-pulse">
             STATUS: ACTIVE / UNDER SURVEILLANCE
           </p>
-        </div>
+        </CardHeader>
 
-        <div className="space-y-6">
-          <div className="rounded-lg border border-gray-800 bg-gray-950/50 p-6 relative">
-            <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-red-600"></span> 自己紹介 (BIO)
-            </h2>
+        <CardContent className="space-y-4">
+          <div className="rounded-lg border border-gray-800 bg-gray-950/50 p-1 relative overflow-hidden">
+            {/* 装飾用ヘッダーバー */}
+            <div className="bg-gray-900/80 px-4 py-2 flex items-center gap-2 border-b border-gray-800">
+              <span className="w-2 h-2 bg-red-600 rounded-sm"></span>
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                自己紹介(BIO)
+              </span>
+            </div>
 
-            {isEditing ? (
-              <div className="space-y-4">
-                <textarea
-                  value={tempText}
-                  onChange={(e) => setTempText(e.target.value)}
-                  className="w-full h-32 rounded-md border border-red-900/50 bg-black p-3 text-sm text-gray-200 focus:border-red-600 focus:ring-1 focus:ring-red-600 outline-none transition-all resize-none"
-                  placeholder="自己紹介を入力してください..."
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="flex-1 rounded-md bg-red-600 py-2 text-xs font-bold text-white hover:bg-red-700 transition-all disabled:opacity-50"
-                  >
-                    {isSaving ? "更新中..." : "データを上書き"}
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="flex-1 rounded-md bg-gray-800 py-2 text-xs font-bold text-gray-400 hover:bg-gray-700 transition-all"
-                  >
-                    破棄
-                  </button>
+            <div className="p-4">
+              {isEditing ? (
+                <div className="space-y-4">
+                  <Textarea
+                    value={tempText}
+                    onChange={(e) => setTempText(e.target.value)}
+                    className="min-h-[140px] border-red-900/50 bg-black text-gray-200 focus-visible:ring-red-600 resize-none leading-relaxed"
+                    placeholder="自己紹介を入力してください..."
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold h-9"
+                    >
+                      {isSaving ? (
+                        "Saving..."
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" /> 上書き保存
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => setIsEditing(false)}
+                      variant="secondary"
+                      className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 h-9"
+                    >
+                      <X className="w-4 h-4 mr-2" /> キャンセル
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="group">
-                <p className="text-sm text-gray-300 leading-relaxed mb-4 whitespace-pre-wrap">
-                  {profileText}
-                </p>
-                <button
-                  onClick={handleEdit}
-                  className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase tracking-widest transition-colors flex items-center gap-1"
-                >
-                  [ 情報を改ざんする ]
-                </button>
-              </div>
-            )}
+              ) : (
+                <div className="group relative min-h-[100px]">
+                  <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap font-mono">
+                    {profileText}
+                  </p>
+
+                  {/* 編集ボタン（ホバーで表示または常時表示） */}
+                  <div className="mt-6 pt-4 border-t border-gray-800/50 flex justify-end">
+                    <Button
+                      onClick={handleEdit}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-400 hover:bg-red-950/30 h-8 text-xs font-bold uppercase tracking-wider"
+                    >
+                      <Edit3 className="w-3 h-3 mr-2" /> データ改ざん
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="bg-red-950/20 border border-red-900/30 rounded p-3">
-            <p className="text-[9px] text-red-400/70 leading-tight">
-              ※ 注意: 自己紹介文に不適切なワードが含まれる場合、即座に「ワードウルフ」のアルゴリズムによりアカウントが凍結される恐れがあります。
+          {/* 警告注記 */}
+          <div className="flex gap-3 bg-red-950/20 border border-red-900/20 rounded p-3 items-start">
+            <ShieldAlert className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-[10px] text-red-400/70 leading-relaxed">
+              ※ 自己紹介文に含まれるキーワードも検閲対象です。不適切な発言が確認された場合、アカウントは即座に凍結されます。
             </p>
           </div>
-        </div>
+        </CardContent>
 
-        <div className="mt-8 text-center">
-          <button
+        <CardFooter className="justify-center pb-8">
+          <Button
+            variant="link"
             onClick={() => router.push("/")}
-            className="text-xs text-gray-600 hover:text-gray-400 transition-colors tracking-widest uppercase"
+            className="text-xs text-gray-600 hover:text-gray-400 tracking-widest uppercase"
           >
-            ← ターミナルに戻る
-          </button>
-        </div>
-      </main>
+            ← ターミナルへ戻る
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

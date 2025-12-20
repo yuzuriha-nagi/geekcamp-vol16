@@ -2,116 +2,132 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function Register() {
   return (
-    // layout.tsx で背景設定済みのため、ここでは背景色を指定せず、
-    // 画面中央に配置するためのレイアウトのみ設定します
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+      {/* shadcn Cardコンポーネント */}
+      <Card className="w-full max-w-sm border-red-900/30 bg-black/80 shadow-2xl backdrop-blur-sm">
 
-      {/* カードコンテナ (透明度やボーダー色はPostInputなどと統一) */}
-      <main className="w-full max-w-sm rounded-xl bg-black/80 p-8 shadow-2xl backdrop-blur-sm sm:p-10 border border-red-900/30">
-
-        {/* ヘッダー */}
-        <div className="flex flex-col items-center gap-2 mb-8">
-          <h1 className="text-2xl font-bold text-white">
+        {/* ヘッダー部分 */}
+        <CardHeader className="items-center text-center space-y-1">
+          <CardTitle className="text-2xl font-bold text-white">
             新規登録
-          </h1>
-          <p className="text-sm text-gray-400">
+          </CardTitle>
+          <CardDescription className="text-gray-400">
             ワードウルフの世界へ参加する
-          </p>
-        </div>
+          </CardDescription>
+        </CardHeader>
 
-        {/* フォーム */}
-        <form className="flex flex-col gap-4">
+        {/* フォーム部分 */}
+        <CardContent>
+          <form className="grid gap-4">
 
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
-              ユーザー名
-            </label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              placeholder="ゲーム内で表示される名前"
-              className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
-              required
-            />
-          </div>
+            {/* ユーザー名 */}
+            <div className="grid gap-2">
+              <Label htmlFor="username" className="text-gray-300">
+                ユーザー名
+              </Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                placeholder="ゲーム内で表示される名前"
+                className="border-gray-700 bg-gray-900/50 text-white placeholder:text-gray-600 focus-visible:ring-red-600 focus-visible:border-red-600"
+                required
+              />
+            </div>
 
-          <div>
-            <label htmlFor="accountId" className="block text-sm font-medium text-gray-300 mb-1">
-              アカウントID
-            </label>
-            <input
-              id="accountId"
-              name="accountId"
-              type="text"
-              placeholder="例：wolf123"
-              className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
-              required
-            />
-          </div>
+            {/* アカウントID */}
+            <div className="grid gap-2">
+              <Label htmlFor="accountId" className="text-gray-300">
+                アカウントID
+              </Label>
+              <Input
+                id="accountId"
+                name="accountId"
+                type="text"
+                placeholder="例：wolf123"
+                className="border-gray-700 bg-gray-900/50 text-white placeholder:text-gray-600 focus-visible:ring-red-600 focus-visible:border-red-600"
+                required
+              />
+            </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-              メールアドレス
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="example@mail.com"
-              className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
-              required
-            />
-          </div>
+            {/* メールアドレス */}
+            <div className="grid gap-2">
+              <Label htmlFor="email" className="text-gray-300">
+                メールアドレス
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="example@mail.com"
+                className="border-gray-700 bg-gray-900/50 text-white placeholder:text-gray-600 focus-visible:ring-red-600 focus-visible:border-red-600"
+                required
+              />
+            </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-              パスワード
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="8文字以上推奨"
-              className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
-              required
-            />
-          </div>
+            {/* パスワード */}
+            <div className="grid gap-2">
+              <Label htmlFor="password" className="text-gray-300">
+                パスワード
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="8文字以上推奨"
+                className="border-gray-700 bg-gray-900/50 text-white placeholder:text-gray-600 focus-visible:ring-red-600 focus-visible:border-red-600"
+                required
+              />
+            </div>
 
-          <div>
-            <label htmlFor="password-confirm" className="block text-sm font-medium text-gray-300 mb-1">
-              パスワード（確認）
-            </label>
-            <input
-              id="password-confirm"
-              name="confirm"
-              type="password"
-              placeholder="もう一度入力してください"
-              className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
-              required
-            />
-          </div>
+            {/* パスワード（確認） */}
+            <div className="grid gap-2">
+              <Label htmlFor="password-confirm" className="text-gray-300">
+                パスワード（確認）
+              </Label>
+              <Input
+                id="password-confirm"
+                name="confirm"
+                type="password"
+                placeholder="もう一度入力してください"
+                className="border-gray-700 bg-gray-900/50 text-white placeholder:text-gray-600 focus-visible:ring-red-600 focus-visible:border-red-600"
+                required
+              />
+            </div>
 
-          <Button
-            type="submit"
-            className="mt-4 w-full rounded-md bg-red-600 py-3 text-lg font-bold text-white transition-all hover:bg-red-700 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-black"
-          >
-            同意して登録する
-          </Button>
-        </form>
+            {/* 登録ボタン */}
+            <Button
+              type="submit"
+              className="mt-2 w-full bg-red-600 py-6 text-lg font-bold text-white hover:bg-red-700 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)]"
+            >
+              同意して登録する
+            </Button>
+          </form>
+        </CardContent>
 
-        <div className="mt-6 text-center text-sm">
+        {/* フッターリンク */}
+        <CardFooter className="flex justify-center">
           <Link
             href="/login"
-            className="text-gray-400 hover:text-red-500 transition-colors font-medium underline-offset-4 hover:underline"
+            className="text-sm text-gray-400 hover:text-red-500 transition-colors font-medium underline-offset-4 hover:underline"
           >
             ← ログイン画面に戻る
           </Link>
-        </div>
-      </main>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

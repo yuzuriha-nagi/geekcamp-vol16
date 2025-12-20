@@ -25,7 +25,7 @@ export const PostInput = ({ currentUser, onPost }: PostInputProps) => {
 
   return (
     // 背景を黒の半透明に変更、ボーダーを暗い色に
-    <Card className="sticky top-[4.5rem] z-30 mb-6 border-gray-800 bg-black/60 backdrop-blur-md shadow-lg shadow-black/20">
+    <Card className="top-[4.5rem] z-30 mb-6 border-gray-800 bg-black/60 backdrop-blur-md shadow-lg shadow-black/20">
       <form onSubmit={handleSubmit} className="p-4 flex gap-4">
 
         <Avatar className="w-10 h-10 border border-gray-700">

@@ -24,6 +24,7 @@ export default function RootLayout({
         {/* ▼ 背景グラデーション (全ページ共通・固定表示) */}
         <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-red-900 via-black to-gray-900 opacity-90 pointer-events-none"></div>
 
+        {/* ここのコメントアウトを切り替えればログイン状態を切り替えれます */}
         <Header currentUser={CURRENT_USER} />
         {/* <Header currentUser={null} /> */}
 
