@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { WarningIcon } from "@/components/icons/WarningIcon";
 import { Button } from "@/components/ui/button";
 
 export default function Register() {
@@ -23,14 +22,6 @@ export default function Register() {
           </p>
         </div>
 
-        {/* 警告メッセージ */}
-        {/* <div className="flex items-start gap-3 rounded-md bg-yellow-900/20 p-3 text-sm text-yellow-500 border border-yellow-700/50 mb-6">
-          <WarningIcon className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-          <span className="leading-tight">
-            注意：登録完了と同時に、あなたの全ての発言が監視対象となります。
-          </span>
-        </div> */}
-
         {/* フォーム */}
         <form className="flex flex-col gap-4">
 
@@ -43,6 +34,34 @@ export default function Register() {
               name="username"
               type="text"
               placeholder="ゲーム内で表示される名前"
+              className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="accountId" className="block text-sm font-medium text-gray-300 mb-1">
+              アカウントID
+            </label>
+            <input
+              id="accountId"
+              name="accountId"
+              type="text"
+              placeholder="例：wolf123"
+              className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              メールアドレス
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="example@mail.com"
               className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
               required
             />
