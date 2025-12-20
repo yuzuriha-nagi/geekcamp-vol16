@@ -11,7 +11,7 @@ export default function Home() {
 
   const handlePost = (content: string) => {
     // 簡易BAN判定
-    const isBanned = content.includes(CURRENT_USER.ngWord);
+    const isBanned = content.includes(CURRENT_USER.ngWord || ""); // null安全対策
     if (isBanned) {
       alert(`☠️ GAME OVER ☠️\n\n禁止ワード「${CURRENT_USER.ngWord}」を踏みました。`);
       return;
@@ -28,16 +28,17 @@ export default function Home() {
   };
 
   return (
-    // 背景をリッチなグレーに変更
+    // 背景色は layout.tsx で設定しているので、ここではレイアウトのみ調整
     <main className="max-w-xl mx-auto pt-6 px-2 sm:px-0 pb-20">
 
       {/* 入力フォーム */}
-      {/* Headerの高さ(約64px/4rem) + 余白分を考慮して top を設定 */}
+      {/* 注: PostInput自体もダークモード対応（bg-black/40 text-white 等）にする必要があります */}
       <PostInput currentUser={CURRENT_USER} onPost={handlePost} />
 
       {/* タイムライン */}
       <div className="space-y-4 mt-6">
         {posts.map((post) => (
+          /* 注: PostCard自体もダークモード対応（bg-black/40 text-white border-gray-800 等）にする必要があります */
           <PostCard
             key={post.id}
             post={post}
