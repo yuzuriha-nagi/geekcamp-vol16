@@ -1,0 +1,3 @@
+name = "geekcamp-vol16"
+pages_build_output_dir = "frontend/.vercel/output/static"
+compatibility_flags = ["nodejs_compat"]
