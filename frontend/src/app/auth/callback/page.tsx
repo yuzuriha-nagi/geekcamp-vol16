@@ -12,8 +12,7 @@ export default function AuthCallback() {
     const handle = async () => {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
-      const codeVerifier = params.get("code_verifier");
-      if (!code || !codeVerifier) {
+      if (!code) {
         setMessage("認証コードが見つかりませんでした");
         return;
       }
