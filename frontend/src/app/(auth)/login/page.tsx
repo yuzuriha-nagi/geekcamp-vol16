@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
+import { useRouter } from "next/navigation"; // 1. 追加
 
 // WarningIconをコンポーネント内で定義（インポートエラーを防ぐため）
 const WarningIcon = ({ className }: { className?: string }) => (
@@ -14,6 +15,7 @@ export default function Home() {
   // ステート管理
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter(); // 2. ルーターの初期化
 
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,14 +31,20 @@ const handleSubmit = async (e: React.FormEvent) => {
       const response = await fetch("http://localhost:3001/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload), // ここで新しい形式のデータを送る
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert("ログイン成功！ワードウルフの世界へようこそ。");
-        console.log("サーバーからの返答:", data);
+        // 3. ユーザー情報をブラウザに保存（bio画面で使うため）
+        localStorage.setItem("user", JSON.stringify({
+          id: data.user.id,
+          profileText: data.user.profileText
+        }));
+
+        // 4. プロフィール画面へリダイレク
+        router.push("/bio"); 
       } else {
         alert(`アクセス拒否: ${data.message}`);
       }
