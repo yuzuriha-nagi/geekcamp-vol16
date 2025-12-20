@@ -92,7 +92,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="your-id または your@email.com"
               className="w-full rounded-md border border-gray-800 bg-gray-950 px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all outline-none"
               required
             />
@@ -106,7 +105,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="********"
               className="w-full rounded-md border border-gray-800 bg-gray-950 px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all outline-none"
               required
             />
