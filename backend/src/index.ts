@@ -27,8 +27,8 @@ app.post('/generate-personal-word', async (req, res) => {
     const { userId, profileText, gameId } = req.body;
 
     if (!userId || !profileText || !gameId) {
-       res.status(400).json({ error: "データ不足" });
-       return;
+      res.status(400).json({ error: "データ不足" });
+      return;
     }
 
     console.log(`Geminiで生成開始: User=${userId}`);
