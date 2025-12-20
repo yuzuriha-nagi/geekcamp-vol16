@@ -48,12 +48,15 @@ export const Header = ({ currentUser }: HeaderProps) => {
 
               {/* ユーザーアイコン */}
               <div className="ml-2 pl-2 border-l border-gray-800 hidden sm:block">
-                <img
-                  src={currentUser.avatarUrl}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full border border-gray-700 cursor-pointer hover:opacity-80 transition-opacity object-cover bg-gray-800"
-                />
+                <Link href="/bio">
+                  <img
+                    src={currentUser.avatarUrl}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full border border-gray-700 cursor-pointer hover:opacity-80 transition-opacity object-cover bg-gray-800"
+                  />
+                </Link>
               </div>
+
             </>
           ) : (
             /* ====================

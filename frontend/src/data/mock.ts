@@ -8,6 +8,7 @@ export const CURRENT_USER: User = {
   handle: "@frontend_dev",
   avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
   ngWord: "やばい",
+  bio: "表向きは都内の大学生。\nしかしその実体は、ワードウルフSNSの潜入捜査官である。\n\n好きな食べ物：リンゴ（バナナではない）",
 };
 
 // 他のユーザーたち

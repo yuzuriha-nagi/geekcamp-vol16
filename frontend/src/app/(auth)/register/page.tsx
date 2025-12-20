@@ -105,7 +105,7 @@ export default function Register() {
 
         <div className="mt-6 text-center text-sm">
           <Link
-            href="/"
+            href="/login"
             className="text-gray-400 hover:text-red-500 transition-colors font-medium underline-offset-4 hover:underline"
           >
             ← ログイン画面に戻る

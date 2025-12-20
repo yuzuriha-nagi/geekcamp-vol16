@@ -1,9 +1,10 @@
 export interface User {
   id: string;
   name: string;
-  handle: string; // @username
+  handle: string;
   avatarUrl: string;
-  ngWord: string; // その人に割り当てられた禁止ワード
+  ngWord?: string; // 自分のNGワード（他人の場合は見えないのでオプショナル）
+  bio?: string;    // ★追加: 自己紹介文
 }
 
 export interface Post {
