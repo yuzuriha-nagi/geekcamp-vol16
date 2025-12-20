@@ -13,18 +13,17 @@ const WarningIcon = ({ className }: { className?: string }) => (
 
 export default function Home() {
   // ステート管理
-  const [username, setUsername] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter(); // 2. ルーターの初期化
 
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // 相手の要望：userId, gameId, profileText の形式にする
       const payload = {
-        userId: username,            // 入力されたユーザー名を userId として送る
+        userId: identifier,          // 入力されたID/メールを userId として送る
         gameId: "DEFAULT_ROOM",     // とりあえず固定値（必要なら入力欄を増やす）
-        profileText: `ユーザー:${username}。ログイン試行。`, // 属性データをまとめた文
+        profileText: `ユーザー:${identifier}。ログイン試行。`, // 属性データをまとめた文
         password: password
       };
 
@@ -87,13 +86,13 @@ const handleSubmit = async (e: React.FormEvent) => {
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
           <div>
             <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-tighter">
-              ユーザー名
+              ID / メールアドレス
             </label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Your Username"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="your-id または your@email.com"
               className="w-full rounded-md border border-gray-800 bg-gray-950 px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all outline-none"
               required
             />
@@ -118,6 +117,14 @@ const handleSubmit = async (e: React.FormEvent) => {
             className="mt-2 w-full rounded-md bg-red-600 py-3.5 text-sm font-black text-white transition-all hover:bg-red-700 hover:shadow-[0_0_20px_rgba(220,38,38,0.5)] active:scale-95"
           >
             ログイン
+          </button>
+
+          <button
+            type="button"
+            className="w-full rounded-md border border-gray-700 bg-gray-900/70 py-3.5 text-sm font-semibold text-white transition-all hover:border-red-600 hover:shadow-[0_0_20px_rgba(220,38,38,0.35)] active:scale-95"
+            onClick={() => alert("Googleログインは現在準備中です")}
+          >
+            Googleで続行（準備中）
           </button>
         </form>
 
