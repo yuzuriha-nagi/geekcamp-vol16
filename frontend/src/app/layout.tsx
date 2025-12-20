@@ -18,12 +18,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      {/* ▼ 修正箇所：className に bg-slate-50 と text-gray-900 を追加/確認してください */}
-      <body className={`${inter.className} bg-slate-50 text-gray-900 antialiased`}>
+      {/* ベースを黒背景・白文字に変更 */}
+      <body className={`${inter.className} bg-gray-900 text-gray-200 antialiased min-h-screen relative`}>
+
+        {/* ▼ 背景グラデーション (全ページ共通・固定表示) */}
+        <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-red-900 via-black to-gray-900 opacity-90 pointer-events-none"></div>
 
         <Header currentUser={CURRENT_USER} />
 
-        <div className="min-h-screen">
+        <div className="relative z-0">
           {children}
         </div>
       </body>
