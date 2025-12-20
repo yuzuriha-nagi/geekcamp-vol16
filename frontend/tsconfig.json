@@ -18,6 +18,10 @@
         "name": "next"
       }
     ],
+<<<<<<< HEAD
+=======
+    "baseUrl":".",
+>>>>>>> yozure
     "paths": {
       "@/*": ["./src/*"]
     }
