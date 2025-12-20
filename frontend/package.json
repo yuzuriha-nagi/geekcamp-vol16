@@ -15,6 +15,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "hono": "^4.11.1",
     "lucide-react": "^0.561.0",
     "next": "16.0.10",
     "react": "19.2.1",
@@ -23,10 +24,14 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@hono/node-server": "^1.19.7",
+    "@supabase/supabase-js": "^2.89.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",

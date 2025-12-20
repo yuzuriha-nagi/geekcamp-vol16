@@ -5,26 +5,49 @@ import { PostInput } from "@/components/PostInput";
 import { PostCard } from "@/components/PostCard";
 import { MOCK_POSTS, CURRENT_USER } from "@/data/mock";
 import { Post } from "@/types";
+import { client } from "@/lib/api";
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
 
-  const handlePost = (content: string) => {
-    // 簡易BAN判定
-    const isBanned = content.includes(CURRENT_USER.ngWord || ""); // null安全対策
-    if (isBanned) {
-      alert(`☠️ GAME OVER ☠️\n\n禁止ワード「${CURRENT_USER.ngWord}」を踏みました。`);
-      return;
-    }
+  const handlePost = async (content: string) => {
+    try {
+      // ▼ API呼び出し
+      const api = client.api.posts as any;
+      const res = await api.$post({
+        json: {
+          userId: CURRENT_USER.id,
+          gameId: "room_A",
+          content: content,
+        },
+      });
 
-    const newPost: Post = {
-      id: crypto.randomUUID(),
-      userId: CURRENT_USER.id,
-      content: content,
-      createdAt: new Date().toISOString(),
-      user: CURRENT_USER,
-    };
-    setPosts([newPost, ...posts]);
+      // ▼ レスポンスの処理
+      if (res.ok) {
+        const data = await res.json();
+
+        // 成功時の処理
+        if (data.success) {
+          console.log("投稿成功:", data.post);
+          // ここで setPosts などを使い、タイムラインを更新する
+          // fetchPosts(); // 再取得関数などがあれば呼ぶ
+        }
+        // 成功ステータスだが中身でBANされている場合 (Serviceの実装による)
+        else if (data.isBanned) {
+          alert(`☠️ GAME OVER ☠️\n\n禁止ワード「${data.ngWord}」を踏みました。`);
+          // 強制ログアウトや画面を赤くするなどの処理
+        }
+      } else {
+        // 400/500エラーの場合（「既に死んでいます」など）
+        const errorData = await res.json();
+        // エラーメッセージの型が合わない場合は any キャスト等で回避
+        alert(`エラー: ${(errorData as any).error || "送信できませんでした"}`);
+      }
+
+    } catch (e) {
+      console.error("通信エラー", e);
+      alert("サーバーに接続できません。");
+    }
   };
 
   return (
