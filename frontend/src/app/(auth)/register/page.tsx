@@ -15,6 +15,21 @@ export default function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const handleGoogle = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) setError(error.message);
+    } catch {
+      setError("Supabaseの環境変数が設定されていません");
+    }
+  };
+
   return (
     // layout.tsx で背景設定済みのため、ここでは背景色を指定せず、
     // 画面中央に配置するためのレイアウトのみ設定します
@@ -161,6 +176,15 @@ export default function Register() {
             className="mt-4 w-full rounded-md bg-red-600 py-3 text-lg font-bold text-white transition-all hover:bg-red-700 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-black"
           >
             {loading ? "登録中..." : "同意して登録する"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full border-gray-700 bg-gray-900/70 text-white hover:border-red-600 hover:text-white"
+            onClick={handleGoogle}
+          >
+            Googleで続行
           </Button>
 
           {error && (

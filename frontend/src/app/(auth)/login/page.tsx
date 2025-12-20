@@ -3,6 +3,7 @@
 import { useState } from "react";
 // import Image from "next/image";
 import { useRouter } from "next/navigation"; // 1. 追加
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 // WarningIconをコンポーネント内で定義（インポートエラーを防ぐため）
 const WarningIcon = ({ className }: { className?: string }) => (
@@ -17,7 +18,7 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const router = useRouter(); // 2. ルーターの初期化
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const payload = {
@@ -50,6 +51,21 @@ const handleSubmit = async (e: React.FormEvent) => {
     } catch (error) {
       console.error("通信エラー:", error);
       alert("サーバーが応答しません。");
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) alert(error.message);
+    } catch (e) {
+      alert("Supabaseの環境変数が設定されていません");
     }
   };
 
@@ -120,9 +136,9 @@ const handleSubmit = async (e: React.FormEvent) => {
           <button
             type="button"
             className="w-full rounded-md border border-gray-700 bg-gray-900/70 py-3.5 text-sm font-semibold text-white transition-all hover:border-red-600 hover:shadow-[0_0_20px_rgba(220,38,38,0.35)] active:scale-95"
-            onClick={() => alert("Googleログインは現在準備中です")}
+            onClick={handleGoogleLogin}
           >
-            Googleで続行（準備中）
+            Googleで続行
           </button>
         </form>
 
