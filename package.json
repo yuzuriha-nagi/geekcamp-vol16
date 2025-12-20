@@ -1,0 +1,8 @@
+{
+  "name": "geekcamp-vol16",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "pages:build": "cd frontend && npm ci && npm run pages:build"
+  }
+}
