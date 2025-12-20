@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -44,13 +44,17 @@ export default function Register() {
             return;
           }
 
-          if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          setLoading(true);
+          let client;
+          try {
+            client = getSupabaseClient();
+          } catch (e) {
             setError("Supabaseの環境変数が設定されていません");
+            setLoading(false);
             return;
           }
 
-          setLoading(true);
-          const { error } = await supabase.from("users").insert({
+          const { error } = await client.from("users").insert({
             username,
             account_id: accountId,
             email,
