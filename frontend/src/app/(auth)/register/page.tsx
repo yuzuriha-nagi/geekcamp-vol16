@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { WarningIcon } from "@/components/icons/WarningIcon";
+import { Button } from "@/components/ui/button";
 
 export default function Register() {
   return (
@@ -15,7 +16,7 @@ export default function Register() {
         {/* ヘッダー */}
         <div className="flex flex-col items-center gap-2 mb-8">
           <h1 className="text-2xl font-bold text-white">
-            新規エージェント登録
+            新規登録
           </h1>
           <p className="text-sm text-gray-400">
             ワードウルフの世界へ参加する
@@ -23,12 +24,12 @@ export default function Register() {
         </div>
 
         {/* 警告メッセージ */}
-        <div className="flex items-start gap-3 rounded-md bg-yellow-900/20 p-3 text-sm text-yellow-500 border border-yellow-700/50 mb-6">
+        {/* <div className="flex items-start gap-3 rounded-md bg-yellow-900/20 p-3 text-sm text-yellow-500 border border-yellow-700/50 mb-6">
           <WarningIcon className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
           <span className="leading-tight">
             注意：登録完了と同時に、あなたの全ての発言が監視対象となります。
           </span>
-        </div>
+        </div> */}
 
         {/* フォーム */}
         <form className="flex flex-col gap-4">
@@ -75,12 +76,12 @@ export default function Register() {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             className="mt-4 w-full rounded-md bg-red-600 py-3 text-lg font-bold text-white transition-all hover:bg-red-700 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-black"
           >
             同意して登録する
-          </button>
+          </Button>
         </form>
 
         <div className="mt-6 text-center text-sm">

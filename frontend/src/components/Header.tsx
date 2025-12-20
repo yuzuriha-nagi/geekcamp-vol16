@@ -62,7 +62,7 @@ export const Header = ({ currentUser }: HeaderProps) => {
             <div className="flex items-center gap-4">
               {/* ログインボタン (テキスト) */}
               <Link
-                href="/" // または /login
+                href="/login" // または /login
                 className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
               >
                 ログイン
