@@ -4,6 +4,8 @@ import { cors } from 'hono/cors'; // CORSミドルウェアをインポート
 
 const app = new Hono();
 
+app.get('/hello', (c) => c.text('Hono is working!'));
+
 // CORSの設定: Next.jsからのアクセスを許可
 app.use('/*', cors({
   origin: 'http://localhost:3000', // Next.jsのURL
@@ -13,19 +15,20 @@ app.use('/*', cors({
 // ログインエンドポイント
 app.post('/login', async (c) => {
   const body = await c.req.json();
-  const { username, password } = body;
+  const { userId, gameId, profileText,password } = body;
+  console.log(`ログイン試行: ${userId} (パスワード: ${password})`);
+  console.log(`属性データ: ${profileText}`);
 
-  console.log(`ログイン試行: ${username}`);
-
-  // TODO: ここでデータベース照合などを行う
-  if (username === "admin" && password === "password123") {
+  // 3. 照合処理（例として userId が admin の場合を成功とする）
+  // パスワードの代わりに gameId や userId で判定するロジックに変更が必要です
+  if (userId === "admin" && password === "password123") { 
     return c.json({
       message: "ログイン成功",
-      user: { name: username }
+      user: { id: userId, room: gameId }
     }, 200);
   } else {
     return c.json({
-      message: "ユーザー名またはパスワードが違います"
+      message: "ユーザーIDが正しくありません"
     }, 401);
   }
 });
