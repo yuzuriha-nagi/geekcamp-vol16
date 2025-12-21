@@ -1,10 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "../supabase";
+import dotenv from "dotenv"; // 追加
+
+dotenv.config(); // 追加
 
 const apiKey = process.env.GEMINI_API_KEY;
+console.log("DEBUG: API Key exists:", !!apiKey); // キーがあるか
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-const model = genAI ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
-
+const model = genAI ? genAI.getGenerativeModel({ model: "gemini-2.5-flash" }) : null;
+console.log("DEBUG: Model initialized:", !!model); // AIモデルが準備できたか
+console.log("DEBUG: Supabase initialized:", !!supabase); // Supabaseが準備できたか
 export const wordService = {
   // 修正: 引数から gameId を削除
   async generatePersonalWord({ userId, profileText }: { userId: string, profileText: string }) {
@@ -56,7 +61,7 @@ export const wordService = {
       const { error } = await supabase
         .from('users')
         .upsert({
-          user_id: userId,
+          id: userId,
           word: secretWord
         });
 

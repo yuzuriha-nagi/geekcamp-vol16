@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
@@ -47,7 +48,7 @@ app.get('/user-details/:userId', async (c) => {
   const userId = c.req.param('userId');
 
   // Supabaseからフォローリストといいね投稿を並列で取得
-const [followsRes, followersRes, likesRes] = await Promise.all([
+  const [followsRes, followersRes, likesRes] = await Promise.all([
     supabase.from('follows').select('*').eq('follower_id', userId), // フォロー中
     supabase.from('follows').select('*').eq('following_id', userId), // フォロワー
     supabase.from('likes').select('*').eq('user_id', userId) // いいね
