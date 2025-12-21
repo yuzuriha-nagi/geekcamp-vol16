@@ -33,6 +33,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
   backend-build:
     runs-on: ubuntu-latest
     defaults:
