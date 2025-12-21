@@ -1,9 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export default function Register() {
+  const [username, setUsername] = useState("");
+  const [accountId, setAccountId] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleGoogle = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const redirectTo =
+        (process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin) +
+        "/auth/callback";
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo,
+        },
+      });
+      if (error) setError(error.message);
+    } catch {
+      setError("Supabaseの環境変数が設定されていません");
+    }
+  };
+
   return (
     // layout.tsx で背景設定済みのため、ここでは背景色を指定せず、
     // 画面中央に配置するためのレイアウトのみ設定します
@@ -23,7 +52,46 @@ export default function Register() {
         </div>
 
         {/* フォーム */}
-        <form className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4" onSubmit={async (e) => {
+          e.preventDefault();
+          setError("");
+          setSuccess("");
+
+          if (password !== passwordConfirm) {
+            setError("パスワードが一致しません");
+            return;
+          }
+
+          setLoading(true);
+          let client;
+          try {
+            client = getSupabaseClient();
+          } catch (e) {
+            setError("Supabaseの環境変数が設定されていません");
+            setLoading(false);
+            return;
+          }
+
+          const { error } = await client.from("users").insert({
+            username,
+            account_id: accountId,
+            email,
+            password,
+          });
+          setLoading(false);
+
+          if (error) {
+            setError(`登録に失敗しました: ${error.message}`);
+            return;
+          }
+
+          setSuccess("登録が完了しました");
+          setUsername("");
+          setAccountId("");
+          setEmail("");
+          setPassword("");
+          setPasswordConfirm("");
+        }}>
 
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
@@ -34,6 +102,8 @@ export default function Register() {
               name="username"
               type="text"
               placeholder="ゲーム内で表示される名前"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
               required
             />
@@ -48,6 +118,8 @@ export default function Register() {
               name="accountId"
               type="text"
               placeholder="例：wolf123"
+              value={accountId}
+              onChange={(e) => setAccountId(e.target.value)}
               className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
               required
             />
@@ -62,6 +134,8 @@ export default function Register() {
               name="email"
               type="email"
               placeholder="example@mail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
               required
             />
@@ -76,6 +150,8 @@ export default function Register() {
               name="password"
               type="password"
               placeholder="8文字以上推奨"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
               required
             />
@@ -90,6 +166,8 @@ export default function Register() {
               name="confirm"
               type="password"
               placeholder="もう一度入力してください"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
               className="w-full rounded-md border border-gray-700 bg-gray-900/50 px-4 py-2.5 text-white placeholder-gray-600 focus:border-red-600 focus:ring-red-600 transition duration-150"
               required
             />
@@ -97,10 +175,27 @@ export default function Register() {
 
           <Button
             type="submit"
+            disabled={loading}
             className="mt-4 w-full rounded-md bg-red-600 py-3 text-lg font-bold text-white transition-all hover:bg-red-700 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-black"
           >
-            同意して登録する
+            {loading ? "登録中..." : "同意して登録する"}
           </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full border-gray-700 bg-gray-900/70 text-white hover:border-red-600 hover:text-white"
+            onClick={handleGoogle}
+          >
+            Googleで続行
+          </Button>
+
+          {error && (
+            <p className="text-sm text-red-400">{error}</p>
+          )}
+          {success && (
+            <p className="text-sm text-green-400">{success}</p>
+          )}
         </form>
 
         <div className="mt-6 text-center text-sm">
