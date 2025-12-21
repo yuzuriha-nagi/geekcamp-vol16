@@ -1,4 +1,3 @@
-// controllers/postController.ts
 import { Context } from 'hono';
 import { postService } from '../services/postService';
 
