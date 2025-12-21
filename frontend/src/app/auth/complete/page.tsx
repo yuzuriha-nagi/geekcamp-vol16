@@ -43,12 +43,17 @@ export default function CompleteProfile() {
     try {
       const supabase = getSupabaseClient();
       setLoading(true);
-      const { error } = await supabase.from("users").insert({
-        username,
-        account_id: accountId,
-        email,
-        password,
-      });
+      const { error } = await supabase
+        .from("users")
+        .upsert(
+          {
+            username,
+            account_id: accountId,
+            email,
+            password,
+          },
+          { onConflict: "email" } // email で一意になるよう更新/挿入
+        );
       setLoading(false);
       if (error) {
         setError(`登録に失敗しました: ${error.message}`);

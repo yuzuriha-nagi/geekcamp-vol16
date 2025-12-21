@@ -4,19 +4,62 @@ import { useEffect, useState } from "react";
 import { PostInput } from "@/components/PostInput";
 import { PostCard } from "@/components/PostCard";
 import { MOCK_POSTS, CURRENT_USER } from "@/data/mock";
-import { Post } from "@/types";
+import { Post, User } from "@/types";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // セッションからユーザー情報を取得
   useEffect(() => {
-    const fetchPosts = async () => {
+    const loadUserAndPosts = async () => {
       try {
-        setLoading(true);
         const supabase = getSupabaseClient();
+        const { data: sessionData } = await supabase.auth.getSession();
+        const sessionUser = sessionData.session?.user;
+        const email = sessionUser?.email;
+
+        let userProfile: User | null = null;
+        if (email) {
+          const handleFromEmail = `@${email.split("@")[0]}`;
+          userProfile = {
+            id: sessionUser?.id ?? "unknown",
+            name:
+              (sessionUser?.user_metadata as any)?.full_name ??
+              email.split("@")[0],
+            handle: handleFromEmail,
+            avatarUrl:
+              (sessionUser?.user_metadata as any)?.avatar_url ??
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+                email.split("@")[0],
+            ngWord: "???",
+          };
+
+          const { data: profile } = await supabase
+            .from("users")
+            .select("*")
+            .eq("email", email)
+            .maybeSingle();
+          if (profile) {
+            userProfile = {
+              id: profile.id ?? userProfile.id,
+              name: profile.username ?? userProfile.name,
+              handle: profile.account_id
+                ? `@${profile.account_id}`
+                : userProfile.handle,
+              avatarUrl:
+                "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+                (profile.username ?? userProfile.name),
+              ngWord: profile.ng_word ?? "???",
+            };
+          }
+        }
+        setCurrentUser(userProfile ?? CURRENT_USER);
+
+        setLoading(true);
         const { data, error } = await supabase
           .from("posts")
           .select("*")
@@ -43,17 +86,20 @@ export default function Home() {
         setPosts(mapped);
       } catch {
         setLoading(false);
-        // Supabase環境変数が無い場合などはモック表示のまま
+        setCurrentUser(CURRENT_USER); // Supabase未設定などの場合はモックユーザー
       }
     };
-    fetchPosts();
+
+    loadUserAndPosts();
   }, []);
 
   const handlePost = async (content: string) => {
+    const author = currentUser ?? CURRENT_USER;
+
     // 簡易BAN判定
-    const isBanned = content.includes(CURRENT_USER.ngWord || ""); // null安全対策
+    const isBanned = content.includes(author.ngWord || ""); // null安全対策
     if (isBanned) {
-      alert(`☠️ GAME OVER ☠️\n\n禁止ワード「${CURRENT_USER.ngWord}」を踏みました。`);
+      alert(`☠️ GAME OVER ☠️\n\n禁止ワード「${author.ngWord}」を踏みました。`);
       return;
     }
 
@@ -63,11 +109,11 @@ export default function Home() {
         .from("posts")
         .insert({
           content,
-          user_id: CURRENT_USER.id,
-          user_name: CURRENT_USER.name,
-          user_handle: CURRENT_USER.handle,
-          user_avatar: CURRENT_USER.avatarUrl,
-          user_ng_word: CURRENT_USER.ngWord,
+          user_id: author.id,
+          user_name: author.name,
+          user_handle: author.handle,
+          user_avatar: author.avatarUrl,
+          user_ng_word: author.ngWord,
         })
         .select()
         .single();
@@ -78,20 +124,20 @@ export default function Home() {
 
       const newPost: Post = {
         id: data?.id ?? crypto.randomUUID(),
-        userId: CURRENT_USER.id,
+        userId: author.id,
         content,
         createdAt: data?.created_at ?? new Date().toISOString(),
-        user: CURRENT_USER,
+        user: author,
       };
       setPosts((prev) => [newPost, ...prev]);
     } catch {
       // Supabase環境変数が無い場合はローカルのみ更新
       const newPost: Post = {
         id: crypto.randomUUID(),
-        userId: CURRENT_USER.id,
+        userId: author.id,
         content,
         createdAt: new Date().toISOString(),
-        user: CURRENT_USER,
+        user: author,
       };
       setPosts((prev) => [newPost, ...prev]);
     }
@@ -112,7 +158,11 @@ export default function Home() {
           <PostCard
             key={post.id}
             post={post}
-            isCurrentUser={post.userId === CURRENT_USER.id}
+            isCurrentUser={
+              currentUser
+                ? post.userId === currentUser.id
+                : post.userId === CURRENT_USER.id
+            }
           />
         ))}
       </div>
