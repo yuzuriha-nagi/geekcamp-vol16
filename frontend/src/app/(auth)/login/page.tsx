@@ -44,7 +44,7 @@ export default function Home() {
         }));
 
         // 4. プロフィール画面へリダイレク
-        router.push("/bio"); 
+        router.push("/bio");
       } else {
         alert(`アクセス拒否: ${data.message}`);
       }
@@ -79,7 +79,7 @@ export default function Home() {
 
       {/* ログインカードコンテナ */}
       <main className="relative z-10 w-full max-sm:mx-4 max-w-sm rounded-xl bg-black/90 p-8 shadow-[0_0_50px_rgba(220,38,38,0.3)] backdrop-blur-sm sm:p-10 border border-red-900/30">
-        
+
         {/* ヘッダー: ロゴとタイトル */}
         <div className="flex flex-col items-center gap-2 mb-8">
           <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mb-2 shadow-lg shadow-red-600/50">

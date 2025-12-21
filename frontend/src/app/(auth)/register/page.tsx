@@ -34,22 +34,19 @@ export default function Register() {
   };
 
   return (
-    // layout.tsx で背景設定済みのため、ここでは背景色を指定せず、
-    // 画面中央に配置するためのレイアウトのみ設定します
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+      {/* shadcn Cardコンポーネント */}
+      <Card className="w-full max-w-sm border-red-900/30 bg-black/80 shadow-2xl backdrop-blur-sm">
 
-      {/* カードコンテナ (透明度やボーダー色はPostInputなどと統一) */}
-      <main className="w-full max-w-sm rounded-xl bg-black/80 p-8 shadow-2xl backdrop-blur-sm sm:p-10 border border-red-900/30">
-
-        {/* ヘッダー */}
-        <div className="flex flex-col items-center gap-2 mb-8">
-          <h1 className="text-2xl font-bold text-white">
+        {/* ヘッダー部分 */}
+        <CardHeader className="items-center text-center space-y-1">
+          <CardTitle className="text-2xl font-bold text-white">
             新規登録
-          </h1>
-          <p className="text-sm text-gray-400">
+          </CardTitle>
+          <CardDescription className="text-gray-400">
             ワードウルフの世界へ参加する
-          </p>
-        </div>
+          </CardDescription>
+        </CardHeader>
 
         {/* フォーム */}
         <form className="flex flex-col gap-4" onSubmit={async (e) => {
@@ -198,15 +195,16 @@ export default function Register() {
           )}
         </form>
 
-        <div className="mt-6 text-center text-sm">
+        {/* フッターリンク */}
+        <CardFooter className="flex justify-center">
           <Link
-            href="/"
-            className="text-gray-400 hover:text-red-500 transition-colors font-medium underline-offset-4 hover:underline"
+            href="/login"
+            className="text-sm text-gray-400 hover:text-red-500 transition-colors font-medium underline-offset-4 hover:underline"
           >
             ← ログイン画面に戻る
           </Link>
-        </div>
-      </main>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

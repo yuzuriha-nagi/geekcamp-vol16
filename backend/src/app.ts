@@ -1,4 +1,4 @@
-import { serve } from '@hono/node-server';
+// backend/src/app.ts (新規作成)
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import dotenv from 'dotenv';
@@ -9,20 +9,15 @@ dotenv.config();
 
 const app = new Hono();
 
-// CORS設定
-app.use('/*', cors());
+app.use('*', cors());
 
-// ルーティング
+// ルート定義
 const routes = app
   .route('/api/words', wordRoutes)
   .route('/api/posts', postRoutes);
 
+app.get('/', (c) => c.text('WordWolf API is running!'));
+
+// 型定義とアプリ本体をエクスポート
 export type AppType = typeof routes;
-
-const port = Number(process.env.PORT) || 3000;
-console.log(`🚀 Server is running on http://localhost:${port}`);
-
-serve({
-  fetch: app.fetch,
-  port
-});
+export default app;

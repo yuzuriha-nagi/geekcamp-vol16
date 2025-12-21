@@ -34,7 +34,7 @@ export default function Home() {
             avatarUrl:
               (sessionUser?.user_metadata as any)?.avatar_url ??
               "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
-                email.split("@")[0],
+              email.split("@")[0],
             ngWord: "???",
           };
 
