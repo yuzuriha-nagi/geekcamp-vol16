@@ -1,23 +1,5 @@
 import { serve } from '@hono/node-server';
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import dotenv from 'dotenv';
-import wordRoutes from './routes/words';
-import postRoutes from './routes/posts';
-
-dotenv.config();
-
-const app = new Hono();
-
-// CORS設定
-app.use('/*', cors());
-
-// ルーティング
-const routes = app
-  .route('/api/words', wordRoutes)
-  .route('/api/posts', postRoutes);
-
-export type AppType = typeof routes;
+import app from './app'; // app.ts を読み込む
 
 const port = Number(process.env.PORT) || 3000;
 console.log(`🚀 Server is running on http://localhost:${port}`);

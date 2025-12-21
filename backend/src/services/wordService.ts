@@ -1,62 +1,72 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "../supabase";
 
-interface GenerateParams {
-  userId: string;
-  profileText: string;
-}
+const apiKey = process.env.GEMINI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const model = genAI ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
 
 export const wordService = {
-  async generatePersonalWord({ userId, profileText, }: GenerateParams) {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+  // 修正: 引数から gameId を削除
+  async generatePersonalWord({ userId, profileText }: { userId: string, profileText: string }) {
+    console.log(`[Service] 生成開始: User=${userId}`);
 
-    // Google Geminiの設定
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    let secretWord: string;
 
-    const prompt = `
-      あなたはワードウルフゲームの出題者です。
-      以下のプロフィールを持つユーザーのために、会話のネタになるような「名詞」を1つ選んでください。
-      
-      条件:
-      1. 一般的な名詞であること。
-      2. その人の属性に関連していること。
-      3. 出力は以下のJSON形式の文字列のみ。余計な文章は禁止。
+    // 1. モックモード
+    if (!model || !supabase) {
+      console.log('⚠️ モックモード: ランダムな単語を返します');
+      const mockWords = ['コーヒー', 'パソコン', '音楽', '旅行', '本', '映画', 'スポーツ', '料理'];
+      secretWord = mockWords[Math.floor(Math.random() * mockWords.length)];
 
-      {
-        "secret_word": "単語",
-        "reason": "理由"
-      }
+      return {
+        status: "success",
+        word: secretWord, // Controller側はこのキーを見ています
+        reason: "モック生成",
+        mock: true
+      };
+    }
 
-      プロフィール:
-      ${profileText}
-    `;
+    // 2. 本番モード
+    try {
+      const prompt = `
+        あなたはワードウルフゲームの出題者です。
+        以下のプロフィールを持つユーザーのために、会話のネタになるような「名詞」を1つ選んでください。
+        
+        条件:
+        1. 一般的な名詞であること。
+        2. その人の属性に関連していること。
+        3. 出力は以下のJSON形式の文字列のみ。余計な文章は禁止。
 
-    // AI生成実行
-    console.log(`Geminiで生成開始: User=${userId}`);
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    let text = response.text();
+        { "secret_word": "単語", "reason": "理由" }
 
-    console.log("Geminiからの返答:", text);
+        プロフィール: ${profileText}
+      `;
 
-    // AIのマークダウン装飾を削除 (```json ... ```)
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      let text = response.text();
 
-    // JSONパース
-    const parsedData = JSON.parse(text);
-    const secretWord = parsedData.secret_word;
+      text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const parsedData = JSON.parse(text);
+      secretWord = parsedData.secret_word;
 
-    // Supabaseに保存
-    const { error } = await supabase
-      .from('users')
-      .upsert({
-        user_id: userId,
-        word: secretWord
-      });
+      // 3. Supabaseへの保存
+      // 修正: game_participants ではなく users テーブル等に保存するロジックに変更
+      // ※ usersテーブルに word カラムがある前提です
+      const { error } = await supabase
+        .from('users')
+        .upsert({
+          user_id: userId,
+          word: secretWord
+        });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    return { secretWord, reason: parsedData.reason };
+      return { status: "success", word: secretWord };
+
+    } catch (error) {
+      console.error("AI生成または保存エラー:", error);
+      throw error;
+    }
   }
 };

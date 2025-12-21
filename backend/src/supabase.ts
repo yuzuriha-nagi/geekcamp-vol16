@@ -3,11 +3,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const SUPABASE_URL = process.env.SUPABASE_URL!;
-const SUPABASE_KEY = process.env.SUPABASE_KEY!;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  throw new Error('Supabase environment variables are missing.');
-}
-
-export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// APIキーがない場合は null を入れておく（モックモード用）
+export const supabase = (supabaseUrl && supabaseKey)
+  ? createClient(supabaseUrl, supabaseKey)
+  : null;

@@ -4,27 +4,25 @@ import { wordService } from '../services/wordService';
 export const wordController = {
   async generate(c: Context) {
     try {
-      // リクエストボディの取得
       const body = await c.req.json();
-      const { userId, profileText, gameId } = body;
+      // 修正: gameId を削除
+      const { userId, profileText } = body;
 
-      // バリデーション
-      if (!userId || !profileText || !gameId) {
-        return c.json({ error: "データ不足: userId, profileText, gameId は必須です" }, 400);
+      // 修正: gameId のチェックを削除
+      if (!userId || !profileText) {
+        return c.json({ error: "データ不足: userId, profileText は必須です" }, 400);
       }
 
-      // サービスの呼び出し (ロジックは全てここに任せる)
+      // Service呼び出し
       const result = await wordService.generatePersonalWord({
         userId,
         profileText,
       });
 
-      // 成功レスポンス
       return c.json({
         status: "success",
-        word: result.secretWord,
-        // 必要ならreasonも返す
-        // reason: result.reason 
+        // 修正: Serviceが返すキー名 'word' に合わせる
+        word: result.word,
       });
 
     } catch (error: any) {
