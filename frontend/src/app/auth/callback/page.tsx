@@ -26,16 +26,16 @@ export default function AuthCallback() {
             setMessage(`エラー: ${error.message}`);
             return;
           }
-          setMessage("ログインが完了しました。リダイレクトします...");
-          router.replace("/");
+          setMessage("ログインが完了しました。プロフィール入力へ移動します...");
+          router.replace("/auth/complete");
           return;
         }
 
         // code がなくても既にセッションがあればそのまま遷移
         const { data } = await supabase.auth.getSession();
         if (data.session) {
-          setMessage("ログイン済みです。リダイレクトします...");
-          router.replace("/");
+          setMessage("ログイン済みです。プロフィール入力へ移動します...");
+          router.replace("/auth/complete");
           return;
         }
 
