@@ -16,41 +16,51 @@ export default function Home() {
   // ステート管理
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter(); // 2. ルーターの初期化
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
     try {
-      const payload = {
-        userId: identifier,          // 入力されたID/メールを userId として送る
-        gameId: "DEFAULT_ROOM",     // とりあえず固定値（必要なら入力欄を増やす）
-        profileText: `ユーザー:${identifier}。ログイン試行。`, // 属性データをまとめた文
-        password: password
-      };
+      const supabase = getSupabaseClient();
 
-      const response = await fetch("http://localhost:3001/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // 3. ユーザー情報をブラウザに保存（bio画面で使うため）
-        localStorage.setItem("user", JSON.stringify({
-          id: data.user.id,
-          profileText: data.user.profileText
-        }));
-
-        // 4. プロフィール画面へリダイレク
-        router.push("/bio");
-      } else {
-        alert(`アクセス拒否: ${data.message}`);
+      // identifier がメールでなければ account_id からメールを取得
+      let email = identifier;
+      if (!identifier.includes("@")) {
+        const { data: found, error: lookupError } = await supabase
+          .from("users")
+          .select("email")
+          .eq("account_id", identifier)
+          .maybeSingle();
+        if (lookupError) {
+          throw lookupError;
+        }
+        if (!found?.email) {
+          setError("該当するアカウントIDが見つかりませんでした");
+          setLoading(false);
+          return;
+        }
+        email = found.email;
       }
-    } catch (error) {
-      console.error("通信エラー:", error);
-      alert("サーバーが応答しません。");
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      setLoading(false);
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+
+      router.push("/");
+    } catch (err: any) {
+      console.error("通信エラー:", err);
+      setError("サーバーが応答しません。");
+      setLoading(false);
     }
   };
 
@@ -131,9 +141,10 @@ export default function Home() {
 
           <button
             type="submit"
+            disabled={loading}
             className="mt-2 w-full rounded-md bg-red-600 py-3.5 text-sm font-black text-white transition-all hover:bg-red-700 hover:shadow-[0_0_20px_rgba(220,38,38,0.5)] active:scale-95"
           >
-            ログイン
+            {loading ? "ログイン中..." : "ログイン"}
           </button>
 
           <button
@@ -143,6 +154,10 @@ export default function Home() {
           >
             Googleで続行
           </button>
+
+          {error && (
+            <p className="text-xs text-red-400 text-center">{error}</p>
+          )}
         </form>
 
         {/* フッターリンク */}
