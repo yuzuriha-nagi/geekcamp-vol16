@@ -32,17 +32,20 @@ export const Header = ({ currentUser }: HeaderProps) => {
           return;
         }
 
+        const meta = (session.user.user_metadata as any) ?? {};
+
         // セッションだけから仮のプロフィールを組み立て
         let profile: User = {
           id: session.user.id ?? "unknown",
-          name: (session.user.user_metadata as any)?.full_name
-            ? (session.user.user_metadata as any).full_name
-            : email.split("@")[0],
-          handle: "@" + email.split("@")[0],
-          avatarUrl: (session.user.user_metadata as any)?.avatar_url
-            ? (session.user.user_metadata as any).avatar_url
+          name: meta.username || meta.full_name || email.split("@")[0],
+          handle:
+            meta.account_id || meta.preferred_username
+              ? `@${meta.account_id || meta.preferred_username}`
+              : "@" + email.split("@")[0],
+          avatarUrl: meta.avatar_url
+            ? meta.avatar_url
             : "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
-              email.split("@")[0],
+              (meta.username || email.split("@")[0]),
           ngWord: "???",
         };
 
