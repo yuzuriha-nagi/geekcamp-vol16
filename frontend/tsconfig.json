@@ -25,6 +25,12 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "hono": [
+        "./node_modules/hono"
+      ],
+      "hono/*": [
+        "./node_modules/hono/*"
       ]
     }
   },
