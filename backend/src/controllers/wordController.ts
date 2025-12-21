@@ -17,7 +17,6 @@ export const wordController = {
       const result = await wordService.generatePersonalWord({
         userId,
         profileText,
-        gameId
       });
 
       // 成功レスポンス
