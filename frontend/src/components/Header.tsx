@@ -19,7 +19,13 @@ export const Header = ({ currentUser }: HeaderProps) => {
       try {
         const supabase = getSupabaseClient();
         const { data } = await supabase.auth.getSession();
-        const email = data.session?.user.email;
+        const session = data.session;
+        if (!session) {
+          setSessionUser(null);
+          return;
+        }
+
+        const email = session.user.email;
         if (!email) {
           setSessionUser(null);
           return;
@@ -27,14 +33,14 @@ export const Header = ({ currentUser }: HeaderProps) => {
 
         // セッションだけから仮のプロフィールを組み立て
         let profile: User = {
-          id: data.session.user.id ?? "unknown",
-          name:
-            (data.session.user.user_metadata as any)?.full_name ??
-            email.split("@")[0],
+          id: session.user.id ?? "unknown",
+          name: (session.user.user_metadata as any)?.full_name
+            ? (session.user.user_metadata as any).full_name
+            : email.split("@")[0],
           handle: "@" + email.split("@")[0],
-          avatarUrl:
-            (data.session.user.user_metadata as any)?.avatar_url ??
-            "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+          avatarUrl: (session.user.user_metadata as any)?.avatar_url
+            ? (session.user.user_metadata as any).avatar_url
+            : "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
               email.split("@")[0],
           ngWord: "???",
         };
