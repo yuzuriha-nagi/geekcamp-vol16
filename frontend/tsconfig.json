@@ -23,16 +23,9 @@
         "name": "next"
       }
     ],
-    // ▼ Honoのパス解決を強制する設定
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "hono": [
-        "./node_modules/hono"
-      ],
-      "hono/*": [
-        "./node_modules/hono/*"
       ]
     }
   },
@@ -43,10 +36,9 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-    // ❌ ここにあった "../backend/src/**/*.ts" は削除しました
   ],
   "exclude": [
     "node_modules",
-    "../backend" // ▼ 念のため明示的に除外に追加
+    "../backend"
   ]
 }
