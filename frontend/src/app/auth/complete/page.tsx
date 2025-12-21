@@ -10,6 +10,7 @@ export default function CompleteProfile() {
   const [username, setUsername] = useState("");
   const [accountId, setAccountId] = useState("");
   const [password, setPassword] = useState("");
+  const [ngWord, setNgWord] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -51,6 +52,7 @@ export default function CompleteProfile() {
             account_id: accountId,
             email,
             password,
+            ng_word: ngWord,
           },
           { onConflict: "email" } // email で一意になるよう更新/挿入
         );
@@ -65,6 +67,7 @@ export default function CompleteProfile() {
         data: {
           username,
           account_id: accountId,
+          ng_word: ngWord,
         },
       });
 
@@ -72,6 +75,7 @@ export default function CompleteProfile() {
       setUsername("");
       setAccountId("");
       setPassword("");
+      setNgWord("");
       router.replace("/");
     } catch {
       setLoading(false);
@@ -122,6 +126,17 @@ export default function CompleteProfile() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-md border border-gray-700 bg-gray-900 px-4 py-2.5 text-white"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">禁止ワード</label>
+            <input
+              type="text"
+              value={ngWord}
+              onChange={(e) => setNgWord(e.target.value)}
+              placeholder="例: やばい"
               className="w-full rounded-md border border-gray-700 bg-gray-900 px-4 py-2.5 text-white"
               required
             />

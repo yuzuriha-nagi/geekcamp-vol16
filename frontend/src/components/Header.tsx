@@ -45,14 +45,14 @@ export const Header = ({ currentUser }: HeaderProps) => {
           avatarUrl: meta.avatar_url
             ? meta.avatar_url
             : "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
-            (meta.username || email.split("@")[0]),
-          ngWord: "???",
+              (meta.username || email.split("@")[0]),
+          ngWord: meta.ng_word || meta.ngWord || "???",
         };
 
         // users テーブルに登録済みならそちらを優先
         const { data: row } = await supabase
           .from("users")
-          .select("id, username, account_id")
+          .select("id, username, account_id, ng_word")
           .eq("email", email)
           .maybeSingle();
         if (row) {
@@ -64,6 +64,7 @@ export const Header = ({ currentUser }: HeaderProps) => {
             avatarUrl:
               "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
               (row.username ?? profile.name),
+            ngWord: row.ng_word ?? profile.ngWord,
           };
         }
 

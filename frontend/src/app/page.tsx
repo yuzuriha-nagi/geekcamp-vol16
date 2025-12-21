@@ -24,18 +24,18 @@ export default function Home() {
 
         let userProfile: User | null = null;
         if (email) {
+          const meta = (sessionUser?.user_metadata as any) ?? {};
           const handleFromEmail = `@${email.split("@")[0]}`;
           userProfile = {
             id: sessionUser?.id ?? "unknown",
             name:
-              (sessionUser?.user_metadata as any)?.full_name ??
-              email.split("@")[0],
+              meta.username ?? meta.full_name ?? email.split("@")[0],
             handle: handleFromEmail,
             avatarUrl:
-              (sessionUser?.user_metadata as any)?.avatar_url ??
+              meta.avatar_url ??
               "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
-              email.split("@")[0],
-            ngWord: "???",
+                (meta.username ?? email.split("@")[0]),
+            ngWord: meta.ng_word ?? meta.ngWord ?? "???",
           };
 
           const { data: profile } = await supabase
@@ -53,7 +53,7 @@ export default function Home() {
               avatarUrl:
                 "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
                 (profile.username ?? userProfile.name),
-              ngWord: profile.ng_word ?? "???",
+              ngWord: profile.ng_word ?? userProfile.ngWord ?? "???",
             };
           }
         }
@@ -149,7 +149,10 @@ export default function Home() {
 
       {/* 入力フォーム */}
       {/* 注: PostInput自体もダークモード対応（bg-black/40 text-white 等）にする必要があります */}
-      <PostInput currentUser={CURRENT_USER} onPost={handlePost} />
+      <PostInput
+        currentUser={currentUser ?? CURRENT_USER}
+        onPost={handlePost}
+      />
 
       {/* タイムライン */}
       <div className="space-y-4 mt-6">
