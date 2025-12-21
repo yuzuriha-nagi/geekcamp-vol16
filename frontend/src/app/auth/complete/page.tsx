@@ -59,6 +59,15 @@ export default function CompleteProfile() {
         setError(`登録に失敗しました: ${error.message}`);
         return;
       }
+
+      // ログイン中のユーザーのメタデータにも保存しておく
+      await supabase.auth.updateUser({
+        data: {
+          username,
+          account_id: accountId,
+        },
+      });
+
       setSuccess("登録が完了しました");
       setUsername("");
       setAccountId("");

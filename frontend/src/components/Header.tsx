@@ -1,13 +1,90 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { User } from "@/types";
 import { Bell, Menu, Search } from "lucide-react";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 interface HeaderProps {
-  // ログインしていない状態(null)を許容するように変更
-  currentUser: User | null;
+  // 外部から渡す場合は任意。未指定なら Supabase セッションから取得。
+  currentUser?: User | null;
 }
 
 export const Header = ({ currentUser }: HeaderProps) => {
+  const [sessionUser, setSessionUser] = useState<User | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data } = await supabase.auth.getSession();
+        const session = data.session;
+        if (!session) {
+          setSessionUser(null);
+          return;
+        }
+
+        const email = session.user.email;
+        if (!email) {
+          setSessionUser(null);
+          return;
+        }
+
+        const meta = (session.user.user_metadata as any) ?? {};
+
+        // セッションだけから仮のプロフィールを組み立て
+        let profile: User = {
+          id: session.user.id ?? "unknown",
+          name: meta.username || meta.full_name || email.split("@")[0],
+          handle:
+            meta.account_id || meta.preferred_username
+              ? `@${meta.account_id || meta.preferred_username}`
+              : "@" + email.split("@")[0],
+          avatarUrl: meta.avatar_url
+            ? meta.avatar_url
+            : "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+            (meta.username || email.split("@")[0]),
+          ngWord: "???",
+        };
+
+        // users テーブルに登録済みならそちらを優先
+        const { data: row } = await supabase
+          .from("users")
+          .select("id, username, account_id")
+          .eq("email", email)
+          .maybeSingle();
+        if (row) {
+          profile = {
+            ...profile,
+            id: row.id ?? profile.id,
+            name: row.username ?? profile.name,
+            handle: row.account_id ? `@${row.account_id}` : profile.handle,
+            avatarUrl:
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+              (row.username ?? profile.name),
+          };
+        }
+
+        setSessionUser(profile);
+      } catch {
+        setSessionUser(null);
+      }
+    };
+
+    load();
+  }, []);
+
+  const user = currentUser ?? sessionUser;
+
+  const handleLogout = async () => {
+    const supabase = getSupabaseClient();
+    await supabase.auth.signOut();
+    setMenuOpen(false);
+    window.location.href = "/login";
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-md border-b border-red-900/30">
       <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -25,7 +102,7 @@ export const Header = ({ currentUser }: HeaderProps) => {
         {/* 右側：分岐処理 */}
         <div className="flex items-center gap-2">
 
-          {currentUser ? (
+          {user ? (
             /* ====================
                ログイン済みの場合
                ==================== */
@@ -47,14 +124,35 @@ export const Header = ({ currentUser }: HeaderProps) => {
               </button>
 
               {/* ユーザーアイコン */}
-              <div className="ml-2 pl-2 border-l border-gray-800 hidden sm:block">
-                <Link href="/bio">
-                  <img
-                    src={currentUser.avatarUrl}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full border border-gray-700 cursor-pointer hover:opacity-80 transition-opacity object-cover bg-gray-800"
-                  />
-                </Link>
+              <div className="relative ml-2 pl-2 border-l border-gray-800 hidden sm:flex items-center gap-2">
+                <div className="text-sm text-gray-300 leading-tight">
+                  <div className="font-semibold text-white">{user.name}</div>
+                  <div className="text-xs text-gray-500">{user.handle}</div>
+                </div>
+                <img
+                  src={user.avatarUrl}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border border-gray-700 cursor-pointer hover:opacity-80 transition-opacity object-cover bg-gray-800"
+                  onClick={() => setMenuOpen((v) => !v)}
+                />
+
+                {menuOpen && (
+                  <div className="absolute top-12 right-0 w-44 bg-black border border-gray-800 rounded-xl shadow-lg shadow-red-900/20 p-2">
+                    <Link
+                      href="/auth/complete"
+                      className="block w-full text-left px-3 py-2 rounded-lg text-sm text-gray-200 hover:bg-red-900/30"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      プロフィール編集
+                    </Link>
+                    <button
+                      className="block w-full text-left px-3 py-2 rounded-lg text-sm text-gray-200 hover:bg-red-900/30"
+                      onClick={handleLogout}
+                    >
+                      ログアウト
+                    </button>
+                  </div>
+                )}
               </div>
 
             </>
