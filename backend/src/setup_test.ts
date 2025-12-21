@@ -5,15 +5,13 @@ async function main() {
   console.log("テストデータを登録します...");
 
   const userId = "manual_user_01";
-  const gameId = "room_test";
   const ngWord = "バナナ"; // テスト用のNGワード
 
   // Supabaseに直接データを書き込む
   const { error } = await supabase
-    .from('game_participants')
+    .from('users')
     .upsert({
       user_id: userId,
-      game_id: gameId,
       word: ngWord,
       is_alive: true
     });
@@ -23,7 +21,6 @@ async function main() {
   } else {
     console.log("✅ 登録完了！");
     console.log(`User: ${userId}`);
-    console.log(`Room: ${gameId}`);
     console.log(`NG Word: ${ngWord}`);
   }
 }

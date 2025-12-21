@@ -4,11 +4,10 @@ import { supabase } from "../supabase";
 interface GenerateParams {
   userId: string;
   profileText: string;
-  gameId: string;
 }
 
 export const wordService = {
-  async generatePersonalWord({ userId, profileText, gameId }: GenerateParams) {
+  async generatePersonalWord({ userId, profileText, }: GenerateParams) {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
     // Google Geminiの設定
@@ -50,9 +49,8 @@ export const wordService = {
 
     // Supabaseに保存
     const { error } = await supabase
-      .from('game_participants')
+      .from('users')
       .upsert({
-        game_id: gameId,
         user_id: userId,
         word: secretWord
       });

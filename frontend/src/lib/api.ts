@@ -1,9 +1,8 @@
-// frontend/lib/client.ts
+// frontend/lib/api.ts
 import { hc } from 'hono/client';
 
 // ▼ 重要: バックエンドから AppType をインポートします
 // 相対パスは実際のフォルダ構成に合わせて調整してください (例: ../../backend/index)
-import type { AppType } from '../../../backend/src/index';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
