@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabaseClient";
 
+export const dynamic = "force-dynamic";
+
 export default function AuthCallback() {
   const router = useRouter();
   const [message, setMessage] = useState("ログイン処理中...");
@@ -12,20 +14,32 @@ export default function AuthCallback() {
     const handle = async () => {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
-      if (!code) {
-        setMessage("認証コードが見つかりませんでした");
-        return;
-      }
 
       try {
         const supabase = getSupabaseClient();
-        const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-        if (error) {
-          setMessage(`エラー: ${error.message}`);
+
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(
+            window.location.href
+          );
+          if (error) {
+            setMessage(`エラー: ${error.message}`);
+            return;
+          }
+          setMessage("ログインが完了しました。リダイレクトします...");
+          router.replace("/");
           return;
         }
-        setMessage("ログインが完了しました。リダイレクトします...");
-        router.replace("/");
+
+        // code がなくても既にセッションがあればそのまま遷移
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          setMessage("ログイン済みです。リダイレクトします...");
+          router.replace("/");
+          return;
+        }
+
+        setMessage("認証コードが見つかりませんでした。もう一度ログインしてください。");
       } catch (e) {
         setMessage("Supabaseの環境変数が設定されていません");
       }
