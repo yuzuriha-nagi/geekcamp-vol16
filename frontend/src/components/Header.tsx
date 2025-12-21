@@ -13,6 +13,7 @@ interface HeaderProps {
 
 export const Header = ({ currentUser }: HeaderProps) => {
   const [sessionUser, setSessionUser] = useState<User | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -74,6 +75,13 @@ export const Header = ({ currentUser }: HeaderProps) => {
 
   const user = currentUser ?? sessionUser;
 
+  const handleLogout = async () => {
+    const supabase = getSupabaseClient();
+    await supabase.auth.signOut();
+    setMenuOpen(false);
+    window.location.href = "/login";
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-md border-b border-red-900/30">
       <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -113,7 +121,7 @@ export const Header = ({ currentUser }: HeaderProps) => {
               </button>
 
               {/* ユーザーアイコン */}
-              <div className="ml-2 pl-2 border-l border-gray-800 hidden sm:flex items-center gap-2">
+              <div className="relative ml-2 pl-2 border-l border-gray-800 hidden sm:flex items-center gap-2">
                 <div className="text-sm text-gray-300 leading-tight">
                   <div className="font-semibold text-white">{user.name}</div>
                   <div className="text-xs text-gray-500">{user.handle}</div>
@@ -122,7 +130,26 @@ export const Header = ({ currentUser }: HeaderProps) => {
                   src={user.avatarUrl}
                   alt="Profile"
                   className="w-8 h-8 rounded-full border border-gray-700 cursor-pointer hover:opacity-80 transition-opacity object-cover bg-gray-800"
+                  onClick={() => setMenuOpen((v) => !v)}
                 />
+
+                {menuOpen && (
+                  <div className="absolute top-12 right-0 w-44 bg-black border border-gray-800 rounded-xl shadow-lg shadow-red-900/20 p-2">
+                    <Link
+                      href="/auth/complete"
+                      className="block w-full text-left px-3 py-2 rounded-lg text-sm text-gray-200 hover:bg-red-900/30"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      プロフィール編集
+                    </Link>
+                    <button
+                      className="block w-full text-left px-3 py-2 rounded-lg text-sm text-gray-200 hover:bg-red-900/30"
+                      onClick={handleLogout}
+                    >
+                      ログアウト
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           ) : (
