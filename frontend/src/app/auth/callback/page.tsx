@@ -26,6 +26,22 @@ export default function AuthCallback() {
             setMessage(`エラー: ${error.message}`);
             return;
           }
+          // プロフィールが既にあるか確認。あればトップへ、なければプロフィール入力へ。
+          const { data: sessionData } = await supabase.auth.getSession();
+          const email = sessionData.session?.user.email;
+          if (email) {
+            const { data: profile } = await supabase
+              .from("users")
+              .select("id")
+              .eq("email", email)
+              .maybeSingle();
+            if (profile) {
+              setMessage("ログインが完了しました。リダイレクトします...");
+              router.replace("/");
+              return;
+            }
+          }
+
           setMessage("ログインが完了しました。プロフィール入力へ移動します...");
           router.replace("/auth/complete");
           return;
@@ -34,6 +50,19 @@ export default function AuthCallback() {
         // code がなくても既にセッションがあればそのまま遷移
         const { data } = await supabase.auth.getSession();
         if (data.session) {
+          const email = data.session.user.email;
+          if (email) {
+            const { data: profile } = await supabase
+              .from("users")
+              .select("id")
+              .eq("email", email)
+              .maybeSingle();
+            if (profile) {
+              setMessage("ログイン済みです。リダイレクトします...");
+              router.replace("/");
+              return;
+            }
+          }
           setMessage("ログイン済みです。プロフィール入力へ移動します...");
           router.replace("/auth/complete");
           return;
