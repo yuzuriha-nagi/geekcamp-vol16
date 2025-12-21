@@ -17,11 +17,13 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
     ],
+    // ▼ Honoのパス解決を強制する設定
     "paths": {
       "@/*": [
         "./src/*"
@@ -40,10 +42,11 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts",
-    "../backend/src/**/*.ts"
+    "**/*.mts"
+    // ❌ ここにあった "../backend/src/**/*.ts" は削除しました
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "../backend" // ▼ 念のため明示的に除外に追加
   ]
 }
