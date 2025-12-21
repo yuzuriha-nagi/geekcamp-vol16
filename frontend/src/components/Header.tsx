@@ -1,13 +1,73 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { User } from "@/types";
 import { Bell, Menu, Search } from "lucide-react";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 interface HeaderProps {
-  // ログインしていない状態(null)を許容するように変更
-  currentUser: User | null;
+  // 外部から渡す場合は任意。未指定なら Supabase セッションから取得。
+  currentUser?: User | null;
 }
 
 export const Header = ({ currentUser }: HeaderProps) => {
+  const [sessionUser, setSessionUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data } = await supabase.auth.getSession();
+        const email = data.session?.user.email;
+        if (!email) {
+          setSessionUser(null);
+          return;
+        }
+
+        // セッションだけから仮のプロフィールを組み立て
+        let profile: User = {
+          id: data.session.user.id ?? "unknown",
+          name:
+            (data.session.user.user_metadata as any)?.full_name ??
+            email.split("@")[0],
+          handle: "@" + email.split("@")[0],
+          avatarUrl:
+            (data.session.user.user_metadata as any)?.avatar_url ??
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+              email.split("@")[0],
+          ngWord: "???",
+        };
+
+        // users テーブルに登録済みならそちらを優先
+        const { data: row } = await supabase
+          .from("users")
+          .select("id, username, account_id")
+          .eq("email", email)
+          .maybeSingle();
+        if (row) {
+          profile = {
+            ...profile,
+            id: row.id ?? profile.id,
+            name: row.username ?? profile.name,
+            handle: row.account_id ? `@${row.account_id}` : profile.handle,
+            avatarUrl:
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+              (row.username ?? profile.name),
+          };
+        }
+
+        setSessionUser(profile);
+      } catch {
+        setSessionUser(null);
+      }
+    };
+
+    load();
+  }, []);
+
+  const user = currentUser ?? sessionUser;
+
   return (
     <header className="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-md border-b border-red-900/30">
       <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -25,7 +85,7 @@ export const Header = ({ currentUser }: HeaderProps) => {
         {/* 右側：分岐処理 */}
         <div className="flex items-center gap-2">
 
-          {currentUser ? (
+          {user ? (
             /* ====================
                ログイン済みの場合
                ==================== */
@@ -47,9 +107,13 @@ export const Header = ({ currentUser }: HeaderProps) => {
               </button>
 
               {/* ユーザーアイコン */}
-              <div className="ml-2 pl-2 border-l border-gray-800 hidden sm:block">
+              <div className="ml-2 pl-2 border-l border-gray-800 hidden sm:flex items-center gap-2">
+                <div className="text-sm text-gray-300 leading-tight">
+                  <div className="font-semibold text-white">{user.name}</div>
+                  <div className="text-xs text-gray-500">{user.handle}</div>
+                </div>
                 <img
-                  src={currentUser.avatarUrl}
+                  src={user.avatarUrl}
                   alt="Profile"
                   className="w-8 h-8 rounded-full border border-gray-700 cursor-pointer hover:opacity-80 transition-opacity object-cover bg-gray-800"
                 />
